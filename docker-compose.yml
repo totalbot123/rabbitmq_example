@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  rmq01:
+    hostname: rmq01
+    image: rabbitmq:3.8-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-admin}
+      - RABBITMQ_ERLANG_COOKIE=hehehe
+    networks:
+      - net
+
+  rmq02:
+    hostname: rmq02
+    image: rabbitmq:3.8-management
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      - CLUSTERED=true
+      - CLUSTER_WITH=rmq01
+      - RABBITMQ_ERLANG_COOKIE=hehehe
+    links:
+      - rmq01
+    networks:
+      - net
+
+  rmq03:
+    hostname: rmq03
+    image: rabbitmq:3.8-management
+    ports:
+      - "5674:5672"
+    environment:
+      - CLUSTERED=true
+      - CLUSTER_WITH=rmq01
+      - RABBITMQ_ERLANG_COOKIE=hehehe
+    links:
+      - rmq01
+      - rmq02
+    networks:
+      - net
+
+networks:
+  net:
